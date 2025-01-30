@@ -23,10 +23,20 @@
 # audio.export(mp3_path, format="mp3", bitrate="192k")
 # print("Конвертація завершена: output.mp3")
 
-from datetime import datetime,timedelta
+# from datetime import datetime,timedelta
+#
+# now = datetime.now().strftime("%Y-%m-%d_%H-%M")
+# print(now)
+import os
 
-now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-print(now)
+RECORDINGS_DIR = "recordings"
+
+for pcm_file in os.listdir(RECORDINGS_DIR):
+    if pcm_file.endswith(".pcm"):
+        user_id = pcm_file.split("_")[1].split(".")[0]
+        datetime = pcm_file.split("_")[2].split(".")[0]
+        print(user_id, datetime)
+
 
 
 
