@@ -1,7 +1,5 @@
 import speech_recognition as sr
 
-
-
 def recognize_speech_from_wav(wav_path):
     recognizer = sr.Recognizer()  # Ініціалізація розпізнавача
 
