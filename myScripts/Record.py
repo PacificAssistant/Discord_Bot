@@ -1,6 +1,6 @@
 from discord.ext.voice_recv import AudioSink
 from datetime import datetime
-from config import RECORDINGS_DIR,RECOGNITION_DIR
+from config.config import RECORDINGS_DIR,RECOGNITION_DIR
 import os
 from pydub import AudioSegment
 

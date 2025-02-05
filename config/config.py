@@ -1,5 +1,6 @@
 import os
 import discord
+from datetime import datetime
 
 
 intents = discord.Intents.default()
@@ -12,6 +13,8 @@ FFMPEG_PATH = "ffmpeg"
 RECORDINGS_DIR = "recordings"
 RECOGNITION_DIR = "recognition"
 BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN" )  # USE YOUR TOKEN AND PLACE HERE
+
+
 
 if not os.path.exists(RECORDINGS_DIR):
     os.makedirs(RECORDINGS_DIR)

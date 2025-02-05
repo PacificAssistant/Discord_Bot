@@ -1,13 +1,15 @@
 import discord
 import os
-from discord import FFmpegPCMAudio,app_commands
+from discord import app_commands
+from discord.app_commands import checks
 from discord.ext import commands
 from discord.ext.voice_recv import VoiceRecvClient
-from config import FFMPEG_PATH,RECORDINGS_DIR,RECOGNITION_DIR
-from Speech_analyse import recognize_speech_from_wav
+from config.config import FFMPEG_PATH,RECORDINGS_DIR,RECOGNITION_DIR
+from myScripts.Speech_analyse import recognize_speech_from_wav
 from gtts import gTTS
-from Record import MP3Recorder
+from myScripts.Record import MP3Recorder
 from datetime import datetime
+
 
 
 class Voice(commands.Cog):
@@ -93,14 +95,6 @@ class Voice(commands.Cog):
         except Exception as e:
             await interaction.response.send_message(f"⚠ Сталася несподівана помилка: {e}", ephemeral=True)
 
-    @app_commands.command(name="member", description="Показує список учасників сервера")
-    async def member(self, interaction: discord.Interaction):
-        """  Список учасників сервера """
-        guild = interaction.guild
-        members = [member.name for member in guild.members]
-        member_list = "\n".join(members)
-        await interaction.response.send_message(f"👥 Учасники сервера:\n{member_list}")
-
     @app_commands.command(name="say",description="Озвучує текст")
     async def say(self, interaction: discord.Interaction, *, text: str):
         """  Бот озвучує введений текст """
@@ -121,12 +115,22 @@ class Voice(commands.Cog):
             await interaction.response.send_message(" Зачекай, я вже говорю!")
 
     @app_commands.command(name="play",description= " Свято наближаєтся ")
-    async def play(self, interaction: discord.Interaction):
+    async def play(self, interaction: discord.Interaction , *, name: str):
+        date = datetime.now().strftime("%Y-%m-%d")
         if not interaction.guild.voice_client:
             await interaction.response.send_message("123")
             return
+        try :
+            audio_path = os.path.join(RECORDINGS_DIR, f"user_{name}._{date}.mp3")
+            if not os.path.exists(audio_path):
+                raise FileNotFoundError(f"Файл `{file_path}` не знайдено!")
 
-        audio_path = os.path.join(RECORDINGS_DIR, "user_sunik._2025-01-31.mp3")
+        except FileNotFoundError as e:
+            await interaction.response.send_message(f" Помилка: {e}", ephemeral=True)
+
+        except Exception as e:
+            await interaction.response.send_message(f" Сталася несподівана помилка: {e}", ephemeral=True)
+
 
         if not os.path.exists(audio_path):
             await interaction.response.send_message(f" Файл `{audio_path}` не знайдено!", ephemeral=True)
@@ -142,7 +146,6 @@ class Voice(commands.Cog):
     @app_commands.command(name="hello", description="Привітатися з ботом")
     async def hello(self, interaction: discord.Interaction):
         await interaction.response.send_message("Привіт!")
-
 
 
 

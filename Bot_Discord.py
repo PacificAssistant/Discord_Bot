@@ -1,7 +1,8 @@
-from config import BOT_TOKEN
+from config.config import BOT_TOKEN
 from discord.ext import commands
-from config import intents
-from Record import MP3Recorder
+from config.config import intents
+from myScripts.Record import MP3Recorder
+
 
 class BOTDiscord(commands.Bot):
     def __init__(self):
@@ -12,7 +13,8 @@ class BOTDiscord(commands.Bot):
         print(f"Бот {self.user} готовий до роботи!")
 
     async def setup_hook(self):
-        await self.load_extension("Cogs.Voice")  # Підключаємо команду
+        # await self.load_extension("Cogs.Voice")  # Підключаємо команду
+        await self.load_extension("Cogs.Admin")
         try:
             synced = await self.tree.sync()
             print(f"Синхронізовано {len(synced)} команд")
