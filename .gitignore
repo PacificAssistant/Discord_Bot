@@ -4,6 +4,7 @@ myScripts/Test.py
 *.pyd
 __pycache__/
 *.swp
+.env
 
 logs/
 *.log
