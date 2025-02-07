@@ -3,16 +3,18 @@ from discord import app_commands
 from discord.app_commands import checks
 import discord
 from database.database import SessionLocal
-from database.models import User,Roles,UserRoles
+from database.models import User, Roles, UserRoles
+from Cogs.BaseCog import BaseCog
 
-class Admin (commands.Cog):
-    def __init__(self,bot):
-        self.bot = bot
 
-    @app_commands.command(name="add_member", description="Add info about members in db")
+class Admin(BaseCog):
+    def __init__(self, bot):
+        super().__init__(bot)
+
+    @app_commands.command(name="add_member", description="")
     @checks.has_permissions(administrator=True)
     async def add_member(self, interaction: discord.Interaction):
-        """  Список учасників сервера """
+        """list of all members in guild"""
         guild = interaction.guild
         session = SessionLocal()
         try:
@@ -21,58 +23,58 @@ class Admin (commands.Cog):
                 if not user:
                     new_user = User(
                         id=member.id,
-                        name = member.name,
+                        name=member.name,
                         join_date=member.joined_at or datetime.utcnow(),
                     )
                     session.add(new_user)
             session.commit()
-            await interaction.response.send_message("Added to db")
+            await interaction.response.send_message(self.message["members_add"])
         except Exception as e:
             session.rollback()
             print(f"Error ocurred :{e}")
         finally:
             session.close()
 
-
-    @app_commands.command(name="add_roles", description="add roles from guild to db")
+    @app_commands.command(name="add_roles", description="")
     @checks.has_permissions(administrator=True)
-    async def add_roles(self,interaction: discord.Interaction):
+    async def add_roles(self, interaction: discord.Interaction):
+        """list of all roles in guild"""
         guild = interaction.guild.roles
         members = interaction.guild.members
         session = SessionLocal()
         try:
-            for role in guild :
+            for role in guild:
                 exiting_role = session.query(Roles).filter_by(id=role.id).first()
                 if not exiting_role:
                     new_role = Roles(
-                        id = role.id,
-                        name = role.name,
-                        about = "test",
-                        role_value = 10,
-                        is_admin = role.permissions.administrator,
+                        id=role.id,
+                        name=role.name,
+                        about="test",
+                        role_value=10,
+                        is_admin=role.permissions.administrator,
                     )
                     session.add(new_role)
-            session.commit()
             for member in members:
-                user = session.query(UserRoles).filter_by(user_id = member.id).first()
-                roles = member.roles # list
-                role_names = [role.name for role in roles] #list role name
+                user = session.query(UserRoles).filter_by(user_id=member.id).first()
+                roles = member.roles  # list
+                role_names = [role.name for role in roles]  # list role name
                 for role in role_names:
-                    exiting_role = session.query(Roles).filter_by(name=role).first()
-                    if not user:
-                        new_user = UserRoles(
-                            user_id=member.id,
-                            role_id=exiting_role.id
-                        )
-                    session.add(new_user)
+                    role_id = session.query(Roles).filter_by(name=role).first().id
+                    role_check = (
+                        session.query(UserRoles).filter_by(role_id=role_info.id).first()
+                    )
+                    if role_check.role_id != role_id and role_check.user_id != user.id:
+                        new_user = UserRoles(user_id=member.id, role_id=role_id)
+                        session.add(new_user)
             session.commit()
-            await interaction.response.send_message("Ролі успішно додані в базу даних!", ephemeral=True)
+            await interaction.response.send_message(
+                self.message["roles_add"], ephemeral=True
+            )
         except Exception as e:
             session.rollback()
             print(f"Error ocurred : {e}")
         finally:
             session.close()
-
 
 
 async def setup(bot: discord.ext.commands.Bot):

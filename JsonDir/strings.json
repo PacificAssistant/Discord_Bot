@@ -1,0 +1,44 @@
+{
+  "descriptions": {
+    "join": "Join bot to voice channel",
+    "record": "Start recording voice channel",
+    "stop": "Stop recording voice channel",
+    "leave": "Disconnect bot from voice channel",
+    "analyse": "Analyse voice text from recorded file",
+    "say": "Voices the text",
+    "play": "Play last voice record from user",
+    "hello": "Say hello to bot",
+    "play_music": "Add info about members in db",
+    "youtube_video": "Open and start playing youtube video",
+    "add_member": "Add info about members in db",
+    "add_roles": "Add roles from guild to db"
+  },
+  "message": {
+    "user_not_in_channel" : "Ви повинні бути в голосовому каналі!",
+    "join_to_channel": " Підключився до {channel.mention}",
+    "bot_not_in_channel": " Бот не підключений до голосового каналу!",
+    "bot_not_record": "Запис не ведеться!",
+    "bot_recording": "Запис вже триває!",
+    "start_record": " Почав запис голосового чату!",
+    "stop_record": " Запис зупинено!",
+    "bot_leave": " Вийшов з голосового каналу!",
+    "analyse_text": " Розпізнаний текст:\n{text}",
+    "bot_say": " Озвучую: `{text}`",
+    "bot_play": " Відтворюю `{file_path}`",
+    "bot_saying": " Зачекай, я вже говорю!",
+    "file_not_found": "Файл `{file_path}` не знайдено!",
+    "hello": "hello",
+    "bot_cant_join": "Не вдалося знайти голосовий модуль!",
+    "play_url": "Відтворюю музику з {url} ",
+    "play_video": " Ось ваше відео: {url}",
+    "roles_add": "Ролі успішно додані в базу даних!",
+    "members_add": "members added to db",
+    "synchronization": "Синхронізовано {count} команд"
+
+  },
+  "error": {
+    "FileNotFoundError": "Файл `{file_path}` не знайдено!",
+    "UnexpectedError" : "Сталася несподівана помилка: {e}",
+    "SynchronizationError": "Помилка при синхронізації команд: {e}"
+  }
+}
