@@ -16,6 +16,8 @@ FFMPEG_PATH = "ffmpeg"
 RECORDINGS_DIR = os.path.join(BASE_DIR, "recordings")
 RECOGNITION_DIR = os.path.join(BASE_DIR, "recognition")
 BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")  # USE YOUR TOKEN AND PLACE HERE
+if not BOT_TOKEN:
+    raise ValueError("❌ DISCORD_BOT_TOKEN не знайдено! Перевір змінні середовища.")
 
 CONFIG_PATH = os.path.join(BASE_DIR, "JsonDir", "strings.json")
 
