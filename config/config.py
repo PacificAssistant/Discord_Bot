@@ -36,6 +36,7 @@ def load_config():
 MESSAGE = load_config()
 
 ydl_opts = {
+    "cookiefile": 'cookies.txt',
     "format": "bestaudio/best",
     "postprocessors": [
         {

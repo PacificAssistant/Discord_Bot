@@ -40,21 +40,23 @@ class Music(BaseCog):
             await interaction.followup.send("Бот не може підключитися", ephemeral=True)
             return
 
+        try:
+            with youtube_dl.YoutubeDL(ydl_opts) as yld:
+                info = yld.extract_info(url, download=False)
+                url2 = info["url"]
+                title = info.get("title", "Unknown Title")
 
-        with youtube_dl.YoutubeDL(ydl_opts) as yld:
-            info = yld.extract_info(url, download=False)
-            url2 = info["url"]
-            title = info.get("title","Unknown Title")
+            self.history.append((url2, title))
+            await self.queue.put((url2, title))
 
-        self.history.append((url2, title))
-        print(f"DEBUG: self.history = {self.history}")
-        await self.queue.put((url2,title))
-        print(self.queue)
+            if not self.curently_playing:
+                await self.play_next_song(voice_client)
 
-        if not self.curently_playing:
-            await self.play_next_song(voice_client)
+            await interaction.followup.send(f"✅ Додано в чергу: **{title}**")
+        except Exception as e:
+            print(f"Unexcepted error: {e} ")
 
-        await interaction.followup.send(f"✅ Додано в чергу: **{title}**")
+
 
     async def play_next_song(self,voice_client):
         """Plays the next song in the queue if one exists.
