@@ -14,7 +14,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 from datetime import date
-from database.database import Base
+from config.config import Base
 
 
 class Audio(Base):

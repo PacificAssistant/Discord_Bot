@@ -2,8 +2,11 @@ import os
 import discord
 from datetime import datetime
 import json
-from database.database import Base, engine
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
+load_dotenv()
 
 intents = discord.Intents.default()
 
@@ -24,6 +27,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("❌ DATABASE_URL не знайдено! Перевір змінні середовища.")
 
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 Base.metadata.create_all(bind=engine)
 
 CONFIG_PATH = os.path.join(BASE_DIR, "JsonDir", "strings.json")

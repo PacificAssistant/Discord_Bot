@@ -3,7 +3,7 @@ from datetime import datetime
 from config.config import RECORDINGS_DIR, RECOGNITION_DIR,BASE_DIR
 import os
 from pydub import AudioSegment
-from database.database import SessionLocal
+from config.config import SessionLocal
 from database.models import User, Audio
 import uuid
 import re
