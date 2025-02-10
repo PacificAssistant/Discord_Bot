@@ -3,8 +3,7 @@ import discord
 from datetime import datetime
 import json
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from database.init_db import db_init
 
 load_dotenv()
 
@@ -22,15 +21,7 @@ RECOGNITION_DIR = os.path.join(BASE_DIR, "recognition")
 BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")  # USE YOUR TOKEN AND PLACE HERE
 if not BOT_TOKEN:
     raise ValueError("❌ DISCORD_BOT_TOKEN не знайдено! Перевір змінні середовища.")
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ValueError("❌ DATABASE_URL не знайдено! Перевір змінні середовища.")
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-Base.metadata.create_all(bind=engine)
+db_init()
 
 CONFIG_PATH = os.path.join(BASE_DIR, "JsonDir", "strings.json")
 

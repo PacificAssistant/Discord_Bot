@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord import app_commands
 from discord.app_commands import checks
 import discord
-from config.config import SessionLocal
+from database.database import SessionLocal
 from database.models import User, Roles, UserRoles
 from Cogs.BaseCog import BaseCog
 

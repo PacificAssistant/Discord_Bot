@@ -7,7 +7,7 @@ from gtts import gTTS
 from myScripts.Record import MP3Recorder
 from datetime import datetime
 from Cogs.BaseCog import BaseCog
-from config.config import SessionLocal
+from database.database import SessionLocal
 from database.models import Audio
 
 
