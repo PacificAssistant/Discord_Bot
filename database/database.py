@@ -9,13 +9,7 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise ValueError("❌ DATABASE_URL не знайдено! Перевір змінні середовища.")
-
-DB_USER = "postgres"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "mydatabase"
-
+    raise ValueError(f"DEBUG: DATABASE_URL = {DATABASE_URL}")
 
 
 engine = create_engine(DATABASE_URL)
