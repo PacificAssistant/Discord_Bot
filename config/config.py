@@ -2,6 +2,7 @@ import os
 import discord
 from datetime import datetime
 import json
+from database.database import Base, engine
 
 
 intents = discord.Intents.default()
@@ -18,6 +19,12 @@ RECOGNITION_DIR = os.path.join(BASE_DIR, "recognition")
 BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")  # USE YOUR TOKEN AND PLACE HERE
 if not BOT_TOKEN:
     raise ValueError("❌ DISCORD_BOT_TOKEN не знайдено! Перевір змінні середовища.")
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise ValueError("❌ DATABASE_URL не знайдено! Перевір змінні середовища.")
+
+Base.metadata.create_all(bind=engine)
 
 CONFIG_PATH = os.path.join(BASE_DIR, "JsonDir", "strings.json")
 
