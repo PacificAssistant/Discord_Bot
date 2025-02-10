@@ -14,7 +14,19 @@ class Admin(BaseCog):
     @app_commands.command(name="add_member", description="")
     @checks.has_permissions(administrator=True)
     async def add_member(self, interaction: discord.Interaction):
-        """list of all members in guild"""
+        """
+               Adds all guild members to the database.
+
+               This method retrieves all members from the Discord guild and checks whether they already exist
+               in the database. If a member is not found, they are added with their ID, name, and join date.
+               The method commits changes to the database and sends a confirmation message upon success.
+
+               Args:
+                   interaction (discord.Interaction): The interaction object representing the command invocation.
+
+               Returns:
+                   None: Sends a message confirming the addition of members or logs an error if one occurs.
+               """
         guild = interaction.guild
         session = SessionLocal()
         try:
@@ -38,7 +50,19 @@ class Admin(BaseCog):
     @app_commands.command(name="add_roles", description="")
     @checks.has_permissions(administrator=True)
     async def add_roles(self, interaction: discord.Interaction):
-        """list of all roles in guild"""
+        """
+            Adds all roles from the guild to the database and associates them with users.
+
+            This method retrieves all roles and members from the Discord guild. It first checks whether
+            each role already exists in the database and adds missing ones. Then, it iterates through all
+            guild members, fetching their roles and associating them with the users in the database.
+
+            Args:
+                interaction (discord.Interaction): The interaction object representing the command invocation.
+
+            Returns:
+                None: Sends an ephemeral message upon successful execution or logs an error if one occurs.
+                """
         guild = interaction.guild.roles
         members = interaction.guild.members
         session = SessionLocal()
@@ -56,7 +80,7 @@ class Admin(BaseCog):
                     session.add(new_role)
             for member in members:
                 user = session.query(UserRoles).filter_by(user_id=member.id).first()
-                roles = member.roles  # list
+                roles = member.roles  # list of object
                 role_names = [role.name for role in roles]  # list role name
                 for role in role_names:
                     role_id = session.query(Roles).filter_by(name=role).first().id

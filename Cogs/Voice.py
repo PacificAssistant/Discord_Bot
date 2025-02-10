@@ -20,25 +20,63 @@ class Voice(BaseCog):
 
     @app_commands.command(name="join", description="")
     async def join(self, interaction: discord.Interaction):
-        """Makes the bot join the user's voice channel."""
-        if not interaction.user.voice or not interaction.user.voice.channel:
+        """Starts recording audio in the current voice channel.
+
+        Initiates audio recording if the bot is in a voice channel and not already recording.
+        Uses the MP3Recorder class to handle the recording process.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+
+        Returns:
+            None: Sends a message confirming the start of recording or error if conditions aren't met.
+        """
+        user = interaction.user
+        # Перевіряємо, чи користувач у голосовому каналі
+        if not user.voice or not user.voice.channel:
             await interaction.response.send_message(
                 self.message["user_not_in_channel"], ephemeral=True
             )
             return
 
-        channel = interaction.user.voice.channel
-        if interaction.guild.voice_client:
-            await interaction.guild.voice_client.disconnect()
+        channel = user.voice.channel
+        voice_client = interaction.guild.voice_client
 
-        await channel.connect(cls=VoiceRecvClient)
-        await interaction.response.send_message(
-            self.message["join_to_channel"].format(channel=channel)
-        )
+        # Якщо бот вже в голосовому каналі
+        if voice_client:
+            if voice_client.channel == channel:
+                await interaction.response.send_message(self.message["bot_in_channel"], ephemeral=True)
+                return
+            await voice_client.disconnect()  # Вихід із поточного каналу
+
+        try:
+            await channel.connect(cls=VoiceRecvClient)
+            if interaction.response.is_done():
+                await interaction.followup.send(
+                    self.message["join_to_channel"].format(channel=channel)
+                )
+            else:
+                await interaction.response.send_message(
+                    self.message["join_to_channel"].format(channel=channel)
+                )
+        except discord.errors.ClientException as e:
+            await interaction.response.send_message(f"❌ Помилка підключення: {str(e)}", ephemeral=True)
+        except Exception as e:
+            await interaction.response.send_message(f"⚠️ Несподівана помилка: {str(e)}", ephemeral=True)
 
     @app_commands.command(name="record", description="")
     async def record(self, interaction: discord.Interaction):
-        """Starts recording the voice channel."""
+        """Starts recording audio in the current voice channel.
+
+        Initiates audio recording if the bot is in a voice channel and not already recording.
+        Uses the MP3Recorder class to handle the recording process.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+
+        Returns:
+            None: Sends a message confirming the start of recording or error if conditions aren't met.
+        """
         vc = interaction.guild.voice_client
 
         if not vc:
@@ -65,7 +103,16 @@ class Voice(BaseCog):
 
     @app_commands.command(name="stop", description="")
     async def stop(self, interaction: discord.Interaction):
-        """Stops recording the voice channel."""
+        """Stops the current audio recording session.
+
+        Halts any ongoing recording and cleans up the recorder instance.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+
+        Returns:
+            None: Sends a message confirming the recording has stopped.
+        """
         vc = interaction.guild.voice_client
 
         if not self.recorder:
@@ -80,7 +127,16 @@ class Voice(BaseCog):
 
     @app_commands.command(name="leave", description="")
     async def leave(self, interaction: discord.Interaction):
-        """Makes the bot leave the voice channel."""
+        """Disconnects the bot from the current voice channel.
+
+        Checks if the bot is in a voice channel and disconnects it if present.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+
+        Returns:
+            None: Sends a message confirming the bot has left the channel.
+        """
         vc = interaction.guild.voice_client
 
         if not vc:
@@ -94,7 +150,20 @@ class Voice(BaseCog):
 
     @app_commands.command(name="analyse", description="")
     async def analyse(self, interaction: discord.Interaction):
-        """Processes the recorded audio and returns the transcribed text."""
+        """Analyzes the recorded audio file and converts it to text.
+
+        Attempts to find and process a recorded audio file for the user from the current date,
+        using speech recognition to convert it to text.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+
+        Returns:
+            None: Sends a message with the transcribed text or error message if processing fails.
+
+        Raises:
+            FileNotFoundError: If the audio file doesn't exist.
+        """
         user_id = interaction.user.name
         date = datetime.now().strftime("%Y-%m-%d")
         file_path = os.path.join(RECOGNITION_DIR, f"user_{user_id}_{date}.wav")
@@ -121,30 +190,60 @@ class Voice(BaseCog):
 
     @app_commands.command(name="say", description="")
     async def say(self, interaction: discord.Interaction, *, text: str):
-        """Uses text-to-speech to make the bot say a given text."""
+        """Converts text to speech and plays it in the voice channel.
+
+        Uses Google Text-to-Speech (gTTS) to convert the provided text to audio and plays it
+        in the current voice channel. If music is playing, it will be paused and resumed after
+        the text-to-speech completes.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+            text (str): The text to convert to speech.
+
+        Returns:
+            None: Sends a message confirming the text being spoken.
+        """
         vc = interaction.guild.voice_client
         if not vc:
             await interaction.response.send_message(self.message["bot_not_in_channel"])
             return
 
+            # Якщо щось грає, зберігаємо потік і ставимо на паузу
+        if vc.is_playing():
+            self.current_audio = vc.source
+            vc.pause()
+            self.is_paused = True
+
         tts = gTTS(text=text, lang="uk")
         audio_file = "tts.mp3"
         tts.save(audio_file)
 
-        if not vc.is_playing():
-            vc.play(
-                discord.FFmpegPCMAudio(audio_file, executable=FFMPEG_PATH),
-                after=lambda e: os.remove(audio_file),
-            )
-            await interaction.response.send_message(
-                self.message["bot_say"].format(text=text)
-            )
-        else:
-            await interaction.response.send_message(self.message["bot_saying"])
+        def after_tts(_):  # _ - Заглушка
+            os.remove(audio_file)  # Видаляємо файл після використання
+            if self.current_audio and self.is_paused:
+                vc.play(self.current_audio)  # Відновлюємо музику
+                self.is_paused = False
+
+        vc.play(discord.FFmpegPCMAudio(audio_file), after=after_tts)
+        await interaction.response.send_message(f"🗣️ {text}")
 
     @app_commands.command(name="play", description="")
     async def play(self, interaction: discord.Interaction, member: discord.Member):
-        """Plays a previously recorded audio file of a member."""
+        """Plays a recorded audio file for a specific member.
+
+        Retrieves and plays an audio recording associated with the specified member from the database.
+        The audio file must exist for the current date.
+
+        Args:
+            interaction (discord.Interaction): The interaction object from the command invocation.
+            member (discord.Member): The Discord member whose recording should be played.
+
+        Returns:
+            None: Sends a message confirming playback or error if file not found.
+
+        Raises:
+            FileNotFoundError: If the audio file doesn't exist.
+        """
         if not interaction.guild.voice_client:
             await interaction.response.send_message(self.message["bot_not_in_channel"])
             return
@@ -182,7 +281,6 @@ class Voice(BaseCog):
 
     @app_commands.command(name="hello", description="")
     async def hello(self, interaction: discord.Interaction):
-        """Sends a hello message."""
         await interaction.response.send_message(self.message["hello"])
 
 

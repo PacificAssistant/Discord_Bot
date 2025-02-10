@@ -18,14 +18,28 @@ from database.database import Base
 
 
 class Audio(Base):
+    """Represents an audio recording in the database.
+
+    This model stores information about audio recordings, including file paths,
+    creation dates, and associations with users.
+
+    Attributes:
+        file_id (str): Primary key, unique identifier for the audio file.
+        file_path (str): Full path to the stored audio file location.
+        created_at (date): Date when the audio recording was created.
+        user_id (int): Foreign key reference to the User who owns this recording.
+        user (User): Relationship to the User model representing the owner.
+
+    Relationships:
+        - user: Many-to-one relationship with User model.
+    """
     __tablename__ = "audio"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     file_id: Mapped[str] = mapped_column(
-        String(255), nullable=True
-    )  # ID файлу (наприклад, UUID)
+        String(255), nullable=True, primary_key=True
+    )
     file_path: Mapped[str] = mapped_column(
         Text, nullable=False
-    )  # Шлях до файлу (або URL)
+    )
     created_at: Mapped[date] = mapped_column(Date, default=date.today)
 
     user_id: Mapped[int] = mapped_column(
@@ -39,6 +53,24 @@ class Audio(Base):
 
 
 class User(Base):
+    """Represents a user in the database.
+
+    This model stores user information and manages relationships with roles
+    and audio recordings.
+
+    Attributes:
+        id (int): Primary key, unique identifier for the user.
+        name (str): User's name, cannot be null.
+        join_date (date): Date when the user joined, defaults to current date.
+        user_roles (list[UserRoles]): List of user-role associations.
+        roles (list[Roles]): List of roles assigned to the user (read-only).
+        audios (list[Audio]): List of audio recordings associated with the user.
+
+    Relationships:
+        - roles: Many-to-many relationship with Roles through UserRoles table.
+        - audios: One-to-many relationship with Audio recordings.
+        - user_roles: One-to-many relationship with UserRoles association table.
+    """
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -60,6 +92,24 @@ class User(Base):
 
 
 class Roles(Base):
+    """Represents a role in the database.
+
+    This model defines different roles that can be assigned to users,
+    including administrative privileges and role hierarchies.
+
+    Attributes:
+        id (int): Primary key, unique identifier for the role.
+        name (str): Name of the role, cannot be null.
+        about (str): Description or information about the role.
+        role_value (int): Numeric value representing role hierarchy/priority.
+        is_admin (bool): Flag indicating if role has administrative privileges.
+        user_roles (list[UserRoles]): List of user-role associations.
+        users (list[User]): List of users assigned to this role (read-only).
+
+    Relationships:
+        - users: Many-to-many relationship with User through UserRoles table.
+        - user_roles: One-to-many relationship with UserRoles association table.
+    """
     __tablename__ = "roles"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -81,6 +131,24 @@ class Roles(Base):
 
 
 class UserRoles(Base):
+    """Association table for the many-to-many relationship between Users and Roles.
+
+    This model represents the junction table that manages the many-to-many
+    relationship between users and roles.
+
+    Attributes:
+        user_id (int): Part of composite primary key, foreign key to users table.
+        role_id (int): Part of composite primary key, foreign key to roles table.
+        user (User): Relationship to the associated User model.
+        role (Roles): Relationship to the associated Roles model.
+
+    Relationships:
+        - user: Many-to-one relationship with User model.
+        - role: Many-to-one relationship with Roles model.
+
+    Notes:
+        - Both foreign keys have CASCADE delete behavior.
+    """
     __tablename__ = "user_roles"
 
     user_id = Column(
