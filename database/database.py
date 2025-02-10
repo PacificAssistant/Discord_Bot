@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://") if os.getenv("DATABASE_URL") else None
+DATABASE_URL = os.getenv("URL")
 
 if not DATABASE_URL:
     raise ValueError("❌ DATABASE_URL не знайдено! Перевір змінні середовища.")
