@@ -46,6 +46,7 @@ class Music(BaseCog):
                 url2 = info["url"]
                 title = info.get("title", "Unknown Title")
 
+
             self.history.append((url2, title))
             await self.queue.put((url2, title))
 

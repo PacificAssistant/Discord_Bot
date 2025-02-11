@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 from dotenv import load_dotenv
 from database.init_db import db_init
+import shutil
 
 load_dotenv()
 
@@ -35,8 +36,18 @@ def load_config():
 
 MESSAGE = load_config()
 
+original_cookie_path = "cookies.txt"
+backup_cookie_path = "cookies.backup.txt"
+
+# Створюємо резервну копію
+shutil.copy2(original_cookie_path, backup_cookie_path)
+if os.path.exists(original_cookie_path):
+    print("Файл знайдено")
+else:
+    print(f"Файл не знайдено cockie {cookie_path} , {path}")
 ydl_opts = {
-    "cookiefile": 'cookies.txt',
+    'cookiefile': backup_cookie_path ,
+    'cookiesfrombrowser': None,
     "format": "bestaudio/best",
     "postprocessors": [
         {
@@ -45,7 +56,8 @@ ydl_opts = {
             "preferredquality": "192",
         },
     ],
-    "noplaylist": True,
+    "noplaylist": True
+
 }
 
 
