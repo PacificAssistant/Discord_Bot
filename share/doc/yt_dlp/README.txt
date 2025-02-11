@@ -1,7 +1,7 @@
 [YT-DLP]
 
-[Release version] [PyPI] [Donate] [Discord] [Supported Sites] [License:
-Unlicense] [CI Status] [Commits] [Last Commit]
+[Release version] [PyPI] [Donate] [Matrix] [Discord] [Supported Sites]
+[License: Unlicense] [CI Status] [Commits] [Last Commit]
 
 yt-dlp is a feature-rich command-line audio/video downloader with
 support for thousands of sites. The project is a fork of youtube-dl
@@ -355,7 +355,7 @@ General Options:
     --no-update                     Do not check for updates (default)
     --update-to [CHANNEL]@[TAG]     Upgrade/downgrade to a specific version.
                                     CHANNEL can be a repository as well. CHANNEL
-                                    and TAG default to "nightly" and "latest"
+                                    and TAG default to "stable" and "latest"
                                     respectively if omitted; See "UPDATE" for
                                     details. Supported channels: stable,
                                     nightly, master
