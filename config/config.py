@@ -47,7 +47,12 @@ else:
     print(f"Файл не знайдено cockie {cookie_path} , {path}")
 ydl_opts = {
     'cookiefile': backup_cookie_path ,
-    'cookiesfrombrowser': None,
+    "http_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive"
+    },
     "format": "bestaudio/best",
     "postprocessors": [
         {
