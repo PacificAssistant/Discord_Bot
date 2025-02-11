@@ -45,24 +45,27 @@ if os.path.exists(original_cookie_path):
     print("Файл знайдено")
 else:
     print(f"Файл не знайдено cockie {cookie_path} , {path}")
-ydl_opts = {
-    'cookiefile': backup_cookie_path ,
-    "http_headers": {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept": "*/*",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive"
-    },
-    "format": "bestaudio/best",
-    "postprocessors": [
-        {
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "mp3",
-            "preferredquality": "192",
-        },
-    ],
-    "noplaylist": True
 
+ydl_opts = {
+    "format": "bestaudio",
+    "no_warnings": True,
+    "extract_flat": "in_playlist",
+    "nocheckcertificate": True,
+    "ignoreerrors": True,
+    "no_cache": True,
+    "http_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-us,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+    },
+    "postprocessors": [{
+        "key": "FFmpegExtractAudio",
+        "preferredcodec": "mp3",
+        "preferredquality": "192",
+    }],
+    "cookiefile": backup_cookie_path,
 }
 
 
